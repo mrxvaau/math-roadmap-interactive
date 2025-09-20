@@ -3,7 +3,7 @@
 Interactive **Math Mastery Roadmap** to track your journey from foundations to calculus, complex variables, Laplace transforms, and linear algebra.  
 It includes a **Flowchart view** and a **Skill Tree view**, with **prerequisite locking**, **click-to-complete nodes**, **auto-saved progress**, **export/import**, and a **print-ready** layout — all in a single HTML file.
 
-> Live demo (when deployed to GitHub Pages): `https://<your-username>.github.io/math-roadmap-interactive/`
+> Live demo (when deployed to GitHub Pages): `https://mrxvaau.github.io/math-roadmap-interactive/`
 
 ---
 
@@ -53,7 +53,7 @@ assets/screenshot.png
 ## Quick Start
 
 ```bash
-git clone https://github.com/<your-username>/math-roadmap-interactive.git
+git clone https://github.com/mrxvaau/math-roadmap-interactive.git
 cd math-roadmap-interactive
 
 # Ensure the main file is named index.html
@@ -79,7 +79,7 @@ git init
 git add .
 git commit -m "feat: add interactive math roadmap"
 git branch -M main
-git remote add origin https://github.com/<your-username>/math-roadmap-interactive.git
+git remote add origin https://github.com/mrxvaau/math-roadmap-interactive.git
 git push -u origin main
 ```
 
@@ -90,7 +90,7 @@ git push -u origin main
 - **Branch:** `main` and **Folder:** `/ (root)`
 - Save. Your site will be available at:
   ```
-  https://<your-username>.github.io/math-roadmap-interactive/
+  https://mrxvaau.github.io/math-roadmap-interactive/
   ```
 
 ---
@@ -198,7 +198,7 @@ git push origin feat/improve-skill-layout
 
 ## License
 
-MIT © <your-name>
+MIT © mrxvaau
 
 ---
 
