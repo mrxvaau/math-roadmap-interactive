@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Math Mastery Roadmap — Interactive</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0f172a; /* slate-900 */
+      --muted:#94a3b8; /* slate-400 */
+      --soft:#e2e8f0;  /* slate-200 */
+      --primary:#2563eb; /* blue-600 */
+      --primary-weak:#bfdbfe; /* blue-200 */
+      --success:#16a34a; /* green-600 */
+      --warning:#d97706; /* amber-600 */
+      --card:#f8fafc;  /* slate-50 */
+      --locked:#cbd5e1; /* slate-300 */
+      --shadow: 0 10px 25px rgba(2,6,23,0.08);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height:1.45;
+    }
+
+    header{
+      position:sticky; top:0; z-index:30; background:rgba(255,255,255,0.9); backdrop-filter: blur(8px);
+      border-bottom:1px solid var(--soft);
+    }
+    .wrap{max-width:1150px; margin:0 auto; padding:18px 20px}
+    .header-inner{display:flex; gap:16px; align-items:center; justify-content:space-between}
+    h1{font-size:clamp(20px,3.2vw,34px); margin:0}
+    .sub{color:#334155; font-weight:500}
+
+    .toolbar{display:flex; gap:10px; flex-wrap:wrap}
+    button, .btn{
+      appearance:none; border:1px solid var(--soft); background:var(--card); color:var(--text);
+      padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600; box-shadow:var(--shadow);
+      transition: transform .05s ease, background .2s ease, border-color .2s ease;
+    }
+    button:hover{background:#eef2ff; border-color:#c7d2fe}
+    button:active{transform:translateY(1px)}
+
+    .layout{display:grid; grid-template-columns: 300px 1fr; gap:20px; align-items:start; padding:24px 20px}
+
+    .card{background:var(--card); border:1px solid var(--soft); border-radius:var(--radius); box-shadow:var(--shadow)}
+    .card h2{margin:0; padding:16px 18px; border-bottom:1px solid var(--soft)}
+    .card .content{padding:16px 18px}
+
+    /* Sidebar Checklist */
+    .section{margin:14px 0}
+    .section h3{margin:10px 0 8px; font-size:15px; letter-spacing:.2px; color:#334155}
+    .item{display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; border:1px dashed transparent}
+    .item.locked{opacity:.55}
+    .item.unlocked{background:#eff6ff; border-color:#bfdbfe}
+    .item.done{background:#ecfdf5; border-color:#a7f3d0}
+    .item label{display:flex; gap:10px; align-items:center; width:100%; cursor:pointer}
+    .item .tag{font-size:11px; padding:2px 8px; border-radius:999px; background:#e2e8f0; color:#0f172a}
+
+    input[type="checkbox"]{width:18px; height:18px}
+    input[type="checkbox"].locked{cursor:not-allowed}
+
+    /* Progress */
+    .progress{height:12px; background:#e5e7eb; border-radius:999px; overflow:hidden}
+    .bar{height:100%; width:0%; background:linear-gradient(90deg, var(--primary), #22d3ee); transition:width .3s ease}
+
+    /* Main panels tabs */
+    .tabs{display:flex; gap:10px; padding:10px}
+    .tab{padding:8px 12px; border-radius:999px; border:1px solid var(--soft); background:#fff; cursor:pointer; font-weight:600}
+    .tab.active{background:#eef2ff; border-color:#c7d2fe; color:#1d4ed8}
+
+    .panels > section{display:none}
+    .panels > section.active{display:block}
+
+    /* SVG boards */
+    .board{width:100%; height:720px; border-top:1px solid var(--soft);}
+    svg{width:100%; height:100%;}
+
+    .node{cursor:pointer}
+    .node rect{rx:12; ry:12; filter: drop-shadow(0 8px 16px rgba(2,6,23,.08));}
+    .node text{font-size:13px; font-weight:700}
+
+    .state-locked rect{fill:#e5e7eb; stroke:#cbd5e1;}
+    .state-unlocked rect{fill:#dbeafe; stroke:#93c5fd}
+    .state-done rect{fill:#dcfce7; stroke:#86efac}
+
+    .edge{stroke:#cbd5e1; stroke-width:2}
+    .edge.unlocked{stroke:#93c5fd}
+    .edge.done{stroke:#86efac}
+
+    .legend{display:flex; gap:10px; align-items:center; flex-wrap:wrap; color:#334155}
+    .dot{width:14px; height:14px; border-radius:50%}
+    .dot.lock{background:#e5e7eb; border:1px solid #cbd5e1}
+    .dot.unlock{background:#dbeafe; border:1px solid #93c5fd}
+    .dot.done{background:#dcfce7; border:1px solid #86efac}
+
+    /* Footer */
+    footer{border-top:1px solid var(--soft); margin-top:20px}
+    footer .wrap{display:flex; justify-content:space-between; align-items:center; gap:10px}
+    .stats{display:flex; gap:14px; color:#334155; flex-wrap:wrap}
+
+    /* Print styles */
+    @media print{
+      header, .toolbar, .tabs, button{display:none !important}
+      .layout{grid-template-columns:1fr; gap:10px; padding:0}
+      .board{height:920px}
+      body{background:#fff}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap header-inner">
+      <div>
+        <h1>Math Mastery Roadmap</h1>
+        <div class="sub">Track prerequisites → unlock topics → conquer calculus, complex variables, Laplace, and linear algebra.</div>
+      </div>
+      <div class="toolbar">
+        <button id="btnExport">Export Progress</button>
+        <button id="btnImport">Import Progress</button>
+        <button id="btnReset">Reset</button>
+        <button onclick="window.print()">Print</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-top:12px">
+    <div class="card" style="margin-bottom:14px">
+      <div class="content" style="display:flex; gap:20px; align-items:center; flex-wrap:wrap">
+        <div style="min-width:280px; flex:1">
+          <div style="font-weight:700; margin-bottom:6px">Overall Progress</div>
+          <div class="progress"><div id="progressBar" class="bar"></div></div>
+        </div>
+        <div class="legend">
+          <div class="dot lock"></div> Locked
+          <div class="dot unlock"></div> Unlocked
+          <div class="dot done"></div> Done
+        </div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- LEFT: Checklist -->
+      <aside class="card">
+        <h2>Checklist & Prerequisites</h2>
+        <div class="content" id="checklist"></div>
+      </aside>
+
+      <!-- RIGHT: Boards -->
+      <main class="card">
+        <div class="tabs">
+          <div class="tab active" data-tab="flow">Flowchart View</div>
+          <div class="tab" data-tab="skill">Skill Tree View</div>
+        </div>
+        <div class="panels">
+          <section id="panel-flow" class="active">
+            <div class="content" style="padding-bottom:0">
+              <p style="margin-top:0">Classic academic flow from foundations → pre-calculus → calculus → complex/Laplace, plus linear algebra & probability side-tracks.</p>
+            </div>
+            <div class="board"><svg id="svgFlow" viewBox="0 0 1200 720" role="img" aria-label="Flowchart"></svg></div>
+          </section>
+          <section id="panel-skill">
+            <div class="content" style="padding-bottom:0">
+              <p style="margin-top:0">Game-like skill tree: complete prerequisites to unlock new nodes.</p>
+            </div>
+            <div class="board"><svg id="svgSkill" viewBox="0 0 1200 720" role="img" aria-label="Skill tree"></svg></div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <footer>
+      <div class="wrap">
+        <div class="stats" id="stats"></div>
+        <div class="sub">Progress saved locally in your browser.</div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+  // ---- DATA MODEL -----------------------------------------------------------
+  // Topic IDs and dependencies (DAG). Keep ids stable for saved progress.
+  const TOPICS = [
+    // Level 1 — Foundations
+    {id:'arithmetic', label:'Arithmetic', level:1, prereq:[]},
+    {id:'algebra_basics', label:'Algebra Basics', level:1, prereq:['arithmetic']},
+    {id:'coord_geo', label:'Coordinate Geometry', level:1, prereq:['algebra_basics']},
+    {id:'trig_basics', label:'Trigonometry Basics', level:1, prereq:['coord_geo']},
+
+    // Level 2 — Pre-Calculus
+    {id:'adv_algebra', label:'Advanced Algebra', level:2, prereq:['trig_basics']},
+    {id:'seq_series', label:'Sequences & Series', level:2, prereq:['adv_algebra']},
+    {id:'analytic_geo', label:'Analytic Geometry', level:2, prereq:['seq_series']},
+    {id:'trig_adv', label:'Trigonometry Advanced', level:2, prereq:['analytic_geo']},
+    {id:'limits', label:'Limits & Continuity', level:2, prereq:['trig_adv']},
+
+    // Level 3 — Calculus Core
+    {id:'diff', label:'Differentiation', level:3, prereq:['limits']},
+    {id:'integ', label:'Integration', level:3, prereq:['diff']},
+    {id:'multi', label:'Multivariable Calculus', level:3, prereq:['integ']},
+
+    // Level 4 — Deeper Analysis
+    {id:'cx_numbers', label:'Complex Numbers', level:4, prereq:['multi']},
+    {id:'cx_functions', label:'Complex Functions', level:4, prereq:['cx_numbers']},
+    {id:'laplace', label:'Laplace Transforms', level:4, prereq:['cx_functions']},
+
+    // Level 5 — Linear Algebra (side chain from Algebra Basics)
+    {id:'matrices', label:'Matrices', level:5, prereq:['algebra_basics']},
+    {id:'systems', label:'Systems of Equations', level:5, prereq:['matrices']},
+    {id:'vectors', label:'Vector Spaces', level:5, prereq:['systems']},
+    {id:'eigen', label:'Eigenvalues & Eigenvectors', level:5, prereq:['vectors']},
+
+    // Level 6 — Probability & Statistics (side chain from Algebra Basics)
+    {id:'prob', label:'Probability Basics', level:6, prereq:['algebra_basics']},
+    {id:'stats', label:'Statistics Foundations', level:6, prereq:['prob']},
+  ];
+
+  // Coordinates for FLOW view (grid-like)
+  const FLOW_POS = {
+    arithmetic:       {x:100,  y:80},
+    algebra_basics:   {x:350,  y:80},
+    coord_geo:        {x:600,  y:80},
+    trig_basics:      {x:850,  y:80},
+
+    adv_algebra:      {x:100,  y:220},
+    seq_series:       {x:350,  y:220},
+    analytic_geo:     {x:600,  y:220},
+    trig_adv:         {x:850,  y:220},
+    limits:           {x:1100, y:220},
+
+    diff:             {x:300,  y:380},
+    integ:            {x:600,  y:380},
+    multi:            {x:900,  y:380},
+
+    cx_numbers:       {x:300,  y:540},
+    cx_functions:     {x:600,  y:540},
+    laplace:          {x:900,  y:540},
+
+    matrices:         {x:150,  y:540},
+    systems:          {x:150,  y:620},
+    vectors:          {x:450,  y:620},
+    eigen:            {x:750,  y:620},
+
+    prob:             {x:1020, y:540},
+    stats:            {x:1020, y:620},
+  };
+
+  // Coordinates for SKILL view (clustered tiers)
+  const SKILL_POS = {
+    arithmetic:       {x:120, y:100},
+    algebra_basics:   {x:320, y:100},
+    coord_geo:        {x:520, y:100},
+    trig_basics:      {x:720, y:100},
+
+    adv_algebra:      {x:220, y:240},
+    seq_series:       {x:420, y:240},
+    analytic_geo:     {x:620, y:240},
+    trig_adv:         {x:820, y:240},
+    limits:           {x:1020,y:240},
+
+    diff:             {x:220, y:380},
+    integ:            {x:520, y:380},
+    multi:            {x:820, y:380},
+
+    cx_numbers:       {x:220, y:520},
+    cx_functions:     {x:520, y:520},
+    laplace:          {x:820, y:520},
+
+    matrices:         {x:100, y:520},
+    systems:          {x:100, y:600},
+    vectors:          {x:360, y:600},
+    eigen:            {x:620, y:600},
+
+    prob:             {x:1020, y:520},
+    stats:            {x:1020, y:600},
+  };
+
+  // ---- STATE ---------------------------------------------------------------
+  const STORAGE_KEY = 'math-roadmap-progress.v1';
+  let progress = loadProgress(); // { [id]: true|false }
+
+  function loadProgress(){
+    try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+    catch{ return {}; }
+  }
+  function saveProgress(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }
+
+  function isUnlocked(id){
+    const topic = TOPICS.find(t=>t.id===id);
+    return topic.prereq.every(p=> !!progress[p]);
+  }
+
+  // ---- CHECKLIST RENDER ----------------------------------------------------
+  function renderChecklist(){
+    const container = document.getElementById('checklist');
+    container.innerHTML = '';
+
+    const byLevel = new Map();
+    TOPICS.forEach(t=>{
+      if(!byLevel.has(t.level)) byLevel.set(t.level, []);
+      byLevel.get(t.level).push(t);
+    });
+    const sortedLevels = Array.from(byLevel.keys()).sort((a,b)=>a-b);
+
+    sortedLevels.forEach(lvl=>{
+      const sec = document.createElement('div'); sec.className='section';
+      const h = document.createElement('h3'); h.textContent = labelForLevel(lvl);
+      sec.appendChild(h);
+
+      byLevel.get(lvl).forEach(t=>{
+        const unlocked = isUnlocked(t.id);
+        const done = !!progress[t.id];
+        const row = document.createElement('div');
+        row.className = 'item ' + (done? 'done' : unlocked? 'unlocked' : 'locked');
+
+        const lab = document.createElement('label'); lab.setAttribute('for','chk_'+t.id);
+        const cb = document.createElement('input'); cb.type='checkbox'; cb.id='chk_'+t.id;
+        cb.checked = done; cb.disabled = !unlocked && !done; if(!unlocked && !done) cb.classList.add('locked');
+        cb.addEventListener('change', ()=>{ progress[t.id] = cb.checked; saveProgress(); refreshAll(); });
+
+        const name = document.createElement('div'); name.style.fontWeight='700'; name.textContent = t.label;
+        const tag = document.createElement('span'); tag.className='tag'; tag.textContent = t.prereq.length? `Prereq: ${t.prereq.length}` : 'Start here';
+
+        lab.appendChild(cb); lab.appendChild(name); lab.appendChild(tag);
+        row.appendChild(lab);
+        sec.appendChild(row);
+      });
+
+      container.appendChild(sec);
+    });
+  }
+
+  function labelForLevel(lvl){
+    return {
+      1:'Level 1 — Foundations',
+      2:'Level 2 — Pre‑Calculus',
+      3:'Level 3 — Calculus Core',
+      4:'Level 4 — Complex & Laplace',
+      5:'Level 5 — Linear Algebra',
+      6:'Level 6 — Probability & Statistics',
+    }[lvl] || `Level ${lvl}`;
+  }
+
+  // ---- SVG HELPERS ---------------------------------------------------------
+  function drawBoard(svg, POS){
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+
+    // edges
+    TOPICS.forEach(t=>{
+      t.prereq.forEach(p=>{
+        const a = POS[p], b = POS[t.id];
+        if(!a||!b) return;
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1', a.x+120); line.setAttribute('y1', a.y+28);
+        line.setAttribute('x2', b.x);     line.setAttribute('y2', b.y+28);
+        line.setAttribute('class','edge ' + (progress[p] ? (isUnlocked(t.id)? 'unlocked' : '') : ''));
+        svg.appendChild(line);
+      });
+    });
+
+    // nodes
+    TOPICS.forEach(t=>{
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      g.setAttribute('class','node ' + (progress[t.id] ? 'state-done' : isUnlocked(t.id) ? 'state-unlocked' : 'state-locked'));
+      g.setAttribute('data-id', t.id);
+
+      const {x,y} = POS[t.id];
+      const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      rect.setAttribute('x', x); rect.setAttribute('y', y); rect.setAttribute('width', 120); rect.setAttribute('height', 56);
+      rect.setAttribute('stroke-width','2');
+
+      const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+      text.setAttribute('x', x+60); text.setAttribute('y', y+34); text.setAttribute('text-anchor','middle');
+      text.textContent = t.label;
+
+      g.appendChild(rect); g.appendChild(text);
+      g.addEventListener('click',()=>onNodeClick(t.id));
+      svg.appendChild(g);
+    });
+  }
+
+  function onNodeClick(id){
+    const unlocked = isUnlocked(id);
+    const done = !!progress[id];
+    if(!unlocked && !done) return; // still locked
+    progress[id] = !done; saveProgress(); refreshAll();
+  }
+
+  // ---- PROGRESS / STATS ----------------------------------------------------
+  function refreshProgress(){
+    const total = TOPICS.length;
+    const done = TOPICS.filter(t=>progress[t.id]).length;
+    const pct = Math.round((done/total)*100);
+    document.getElementById('progressBar').style.width = pct + '%';
+
+    const stats = document.getElementById('stats');
+    stats.innerHTML = `Completed: <b>${done}/${total}</b> • ${pct}%`;
+  }
+
+  // ---- PANELS / TABS -------------------------------------------------------
+  function setupTabs(){
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab=>{
+      tab.addEventListener('click', ()=>{
+        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+        const name = tab.dataset.tab;
+        document.querySelectorAll('.panels > section').forEach(p=>p.classList.remove('active'));
+        document.getElementById('panel-' + name).classList.add('active');
+      });
+    });
+  }
+
+  // ---- EXPORT / IMPORT / RESET --------------------------------------------
+  function setupDataButtons(){
+    document.getElementById('btnExport').addEventListener('click', ()=>{
+      const data = JSON.stringify(progress, null, 2);
+      const blob = new Blob([data], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'math-roadmap-progress.json'; a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('btnImport').addEventListener('click', ()=>{
+      const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
+      inp.onchange = () => {
+        const file = inp.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try{
+            const obj = JSON.parse(reader.result);
+            progress = obj || {}; saveProgress(); refreshAll();
+          }catch(e){ alert('Invalid JSON file.'); }
+        };
+        reader.readAsText(file);
+      };
+      inp.click();
+    });
+
+    document.getElementById('btnReset').addEventListener('click', ()=>{
+      if(confirm('Reset all progress?')){ progress = {}; saveProgress(); refreshAll(); }
+    });
+  }
+
+  // ---- RENDER ALL ----------------------------------------------------------
+  function refreshBoards(){
+    drawBoard(document.getElementById('svgFlow'), FLOW_POS);
+    drawBoard(document.getElementById('svgSkill'), SKILL_POS);
+  }
+
+  function refreshAll(){
+    renderChecklist();
+    refreshProgress();
+    refreshBoards();
+  }
+
+  // ---- INIT ----------------------------------------------------------------
+  setupTabs();
+  setupDataButtons();
+  refreshAll();
+
+  </script>
+</body>
+</html>
