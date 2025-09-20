@@ -302,14 +302,17 @@
     } 
     svg{width:100%; height:100%; overflow: visible}
 
-    .node{cursor:pointer; transition: all 0.2s ease}
-    .node:hover{transform: scale(1.05)}
+    .node{
+      cursor:pointer; 
+      transition: transform 0.2s ease; 
+      transform-origin: 50% 50%;
+      transform-box: fill-box;
+    }
+    .node:hover{transform: scale(1.2)}
     .node rect{
       rx:var(--radius); ry:var(--radius); 
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
-      transition: all 0.2s ease;
     }
-    .node:hover rect{filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2))}
     .node text{font-size:12px; font-weight:700; fill: var(--text); text-anchor: middle}
 
     .state-locked rect{fill:var(--soft); stroke:var(--locked); stroke-width:2} 
