@@ -59,7 +59,7 @@
     *{box-sizing:border-box}
     html,body{height:100%; margin:0; padding:0}
     body{
-      background: var(--bg);
+      background: linear-gradient(135deg, var(--bg) 0%, #0a1628 50%, var(--bg) 100%);
       color:var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       line-height:1.6;
@@ -68,7 +68,7 @@
 
     header{
       position:sticky; top:0; z-index:100; 
-      background: var(--bg);
+      background: rgba(2, 6, 23, 0.95);
       backdrop-filter: blur(12px) saturate(180%);
       border-bottom:1px solid var(--border);
       box-shadow: var(--shadow);
@@ -294,11 +294,12 @@
     /* SVG boards */
     .board{
       width:100%; 
-      height:850px; 
+      height:800px; 
       border-top:1px solid var(--border);
-      background: var(--bg);
+      background: linear-gradient(45deg, transparent 24%, rgba(30, 41, 59, 0.1) 25%, rgba(30, 41, 59, 0.1) 26%, transparent 27%, transparent 74%, rgba(30, 41, 59, 0.1) 75%, rgba(30, 41, 59, 0.1) 76%, transparent 77%), linear-gradient(45deg, transparent 24%, rgba(30, 41, 59, 0.1) 25%, rgba(30, 41, 59, 0.1) 26%, transparent 27%, transparent 74%, rgba(30, 41, 59, 0.1) 75%, rgba(30, 41, 59, 0.1) 76%, transparent 77%);
+      background-size: 40px 40px;
+      background-position: 0 0, 20px 20px;
       overflow: visible;
-      padding: 20px;
     } 
     svg{width:100%; height:100%; overflow: visible}
 
@@ -346,7 +347,7 @@
     @media print{
       header, .toolbar, .tabs, button{display:none !important}
       .layout{grid-template-columns:1fr; gap:10px; padding:0}
-      .board{height:1050px; background: white !important; padding: 20px}
+      .board{height:1000px; background: white !important}
       body{background:#fff !important}
       .card{box-shadow: none !important; border: 1px solid #ccc !important}
     }
@@ -408,13 +409,13 @@
             <div class="content" style="padding-bottom:16px">
               <p style="margin-top:0; color:var(--muted)">Classic academic flow from foundations → pre-calculus → calculus → complex/Laplace, plus linear algebra & probability side-tracks.</p>
             </div>
-            <div class="board"><svg id="svgFlow" viewBox="0 0 1200 850" role="img" aria-label="Flowchart"></svg></div>
+            <div class="board"><svg id="svgFlow" viewBox="0 0 1200 800" role="img" aria-label="Flowchart"></svg></div>
           </section>
           <section id="panel-skill">
             <div class="content" style="padding-bottom:16px">
               <p style="margin-top:0; color:var(--muted)">Game-like skill tree: complete prerequisites to unlock new nodes.</p>
             </div>
-            <div class="board"><svg id="svgSkill" viewBox="0 0 1200 850" role="img" aria-label="Skill tree"></svg></div>
+            <div class="board"><svg id="svgSkill" viewBox="0 0 1200 800" role="img" aria-label="Skill tree"></svg></div>
           </section>
         </div>
       </main>
@@ -590,41 +591,6 @@
     return topic.prereq.every(p=> !!progress[p]);
   }
 
-  // Get all topics that depend on a given topic (direct and indirect children)
-  function getDependentTopics(topicId) {
-    const dependents = new Set();
-    
-    function findDependents(id) {
-      TOPICS.forEach(topic => {
-        if (topic.prereq.includes(id) && !dependents.has(topic.id)) {
-          dependents.add(topic.id);
-          findDependents(topic.id); // Recursively find children of children
-        }
-      });
-    }
-    
-    findDependents(topicId);
-    return Array.from(dependents);
-  }
-
-  // Update progress with cascading logic
-  function updateProgress(topicId, isChecked) {
-    if (isChecked) {
-      // When checking, just check this topic
-      progress[topicId] = true;
-    } else {
-      // When unchecking, uncheck this topic and all its dependents
-      progress[topicId] = false;
-      const dependents = getDependentTopics(topicId);
-      dependents.forEach(depId => {
-        progress[depId] = false;
-      });
-    }
-    
-    saveProgress();
-    refreshAll();
-  }
-
   // ---- CHECKLIST RENDER ----------------------------------------------------
   function renderChecklist(){
     const container = document.getElementById('checklist');
@@ -651,9 +617,7 @@
         const lab = document.createElement('label'); lab.setAttribute('for','chk_'+t.id);
         const cb = document.createElement('input'); cb.type='checkbox'; cb.id='chk_'+t.id;
         cb.checked = done; cb.disabled = !unlocked && !done; if(!unlocked && !done) cb.classList.add('locked');
-        cb.addEventListener('change', ()=>{ 
-          updateProgress(t.id, cb.checked);
-        });
+        cb.addEventListener('change', ()=>{ progress[t.id] = cb.checked; saveProgress(); refreshAll(); });
 
         const name = document.createElement('div'); name.style.fontWeight='700'; name.textContent = t.label;
         const tag = document.createElement('span'); tag.className='tag'; tag.textContent = t.prereq.length? `Prereq: ${t.prereq.length}` : 'Start here';
@@ -721,7 +685,7 @@
     const unlocked = isUnlocked(id);
     const done = !!progress[id];
     if(!unlocked && !done) return; // still locked
-    updateProgress(id, !done);
+    progress[id] = !done; saveProgress(); refreshAll();
   }
 
   // ---- PROGRESS / STATS ----------------------------------------------------
